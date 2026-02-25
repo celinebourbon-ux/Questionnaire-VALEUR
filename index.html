@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionnaire V.A.L.E.U.R© - Analyse Complète</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --teal-500: #21808d;
+            --teal-600: #1d7480;
+            --cream-50: #fcfcf9;
+            --slate-900: #13343b;
+            --slate-500: #626c71;
+            --gray-200: #f5f5f5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--cream-50);
+            color: var(--slate-900);
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        header {
+            background: linear-gradient(135deg, var(--teal-500), var(--teal-600));
+            color: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        header p { font-size: 1.1em; opacity: 0.95; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 10px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--teal-500);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .section {
+            display: none;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: var(--slate-900);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .section-subtitle {
+            color: var(--slate-500);
+            margin-bottom: 30px;
+            font-size: 1.05em;
+        }
+
+        .demographics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #fffffe;
+            border-radius: 8px;
+        }
+
+        .demographic-field { display: flex; flex-direction: column; }
+        .demographic-field label { font-weight: 500; margin-bottom: 8px; }
+        .demographic-field input, .demographic-field select {
+            padding: 12px;
+            border: 1px solid #a7a9a9;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+
+        .item-container {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #fffffe;
+            border-radius: 8px;
+            border-left: 4px solid var(--teal-500);
+        }
+
+        .item-number { font-weight: 600; color: var(--teal-600); margin-bottom: 8px; }
+        .item-text { font-size: 1.05em; margin-bottom: 15px; line-height: 1.5; }
+
+        .scale-container {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .scale-option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 80px;
+        }
+
+        .scale-option input[type="radio"] {
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            accent-color: var(--teal-500);
+        }
+
+        .scale-option label { font-size: 0.85em; color: var(--slate-500); text-align: center; }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        button {
+            padding: 14px 30px;
+            font-size: 1.05em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--teal-500);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: var(--teal-600);
+            box-shadow: 0 4px 12px rgba(33, 128, 141, 0.3);
+        }
+
+        .btn-secondary { background: var(--gray-200); color: var(--slate-900); }
+        .btn-secondary:hover { background: #e0e0e0; }
+
+        .instructions {
+            background: rgba(33, 128, 141, 0.05);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--teal-500);
+        }
+
+        .instructions h3 { color: var(--teal-600); margin-bottom: 15px; font-size: 1.3em; }
+        .instructions p { margin-bottom: 10px; line-height: 1.7; }
+
+        .peurs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .peur-item {
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            font-size: 0.95em;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .results-header {
+            background: var(--teal-500);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .scores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .score-card {
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            border-top: 4px solid;
+        }
+
+        .score-value { font-size: 3em; font-weight: bold; margin: 15px 0; }
+        .score-level { font-size: 1.1em; font-weight: 600; margin-bottom: 10px; }
+
+        .score-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--gray-200);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .score-bar-fill { height: 100%; transition: width 0.6s ease; }
+
+        .red { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.15)); border-color: #ef4444; }
+        .orange { background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(249, 115, 22, 0.15)); border-color: #f97316; }
+        .yellow { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.15)); border-color: #eab308; }
+        .green { background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.15)); border-color: #22c55e; }
+        .blue { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.15)); border-color: #3b82f6; }
+        .indigo { background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.15)); border-color: #8b5cf6; }
+        .violet { background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(236, 72, 153, 0.15)); border-color: #ec4899; }
+
+        .portrait-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .portrait-section h3 { color: var(--teal-600); margin-bottom: 15px; font-size: 1.6em; }
+        .portrait-section h4 { margin-top: 25px; margin-bottom: 12px; font-size: 1.3em; }
+        .portrait-text { line-height: 1.8; margin-bottom: 15px; }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .association-card {
+            background: #fffffe;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--teal-500);
+        }
+
+        .association-card h5 { color: var(--teal-600); margin-bottom: 10px; font-size: 1.2em; }
+
+        .extreme-responses {
+            background: rgba(239, 68, 68, 0.08);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .extreme-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .faq-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--teal-500);
+        }
+
+        .faq-question { font-weight: 600; color: var(--teal-600); margin-bottom: 10px; font-size: 1.1em; }
+        .faq-answer { line-height: 1.7; }
+
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-export {
+            padding: 14px 28px;
+            background: var(--teal-500);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-export:hover {
+            background: var(--teal-600);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 128, 141, 0.3);
+        }
+
+        .btn-google { background: #4285F4; }
+        .btn-google:hover { background: #357ae8; }
+        .btn-reset { background: var(--gray-200); color: var(--slate-900); }
+        .btn-reset:hover { background: #e0e0e0; }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--teal-500);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media print {
+            .export-buttons, .buttons, header, .progress-bar { display: none !important; }
+        }
+
+        @media (max-width: 768px) {
+            .demographics { grid-template-columns: 1fr; }
+            .peurs-grid { grid-template-columns: 1fr; }
+            header h1 { font-size: 1.8em; }
+            .scores-grid { grid-template-columns: 1fr; }
+            .export-buttons { flex-direction: column; }
+            .btn-export { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Génération du PDF en cours...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🎭 Questionnaire V.A.L.E.U.R©</h1>
+            <p>Identification des Défenses Psychologiques</p>
+        </header>
+
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+
+        <div class="section active" id="section-welcome">
+            <h2 style="text-align: center; margin-bottom: 30px;">Bienvenue</h2>
+            <div class="instructions">
+                <h3>📋 À propos de ce questionnaire</h3>
+                <p>Ce questionnaire explore les <strong>défenses psychologiques</strong> que nous développons face aux situations perçues comme menaçantes.</p>
+
+                <p style="margin-top: 15px; margin-bottom: 10px;"><strong>7 peurs fondamentales universelles :</strong></p>
+                <div class="peurs-grid">
+                    <div class="peur-item" style="border-left: 3px solid #ef4444;">🔴 La mort / Maladie</div>
+                    <div class="peur-item" style="border-left: 3px solid #f97316;">🟠 La souffrance émotionnelle</div>
+                    <div class="peur-item" style="border-left: 3px solid #eab308;">🟡 L'inconnu / Incertitude</div>
+                    <div class="peur-item" style="border-left: 3px solid #22c55e;">🟢 Le rejet / Abandon</div>
+                    <div class="peur-item" style="border-left: 3px solid #3b82f6;">🔵 L'impuissance</div>
+                    <div class="peur-item" style="border-left: 3px solid #8b5cf6;">🟣 L'échec / Insuffisance</div>
+                    <div class="peur-item" style="border-left: 3px solid #ec4899;">⚫ La perte de soi</div>
+                </div>
+
+                <p><strong>Échelle de réponse :</strong> 0 (Jamais) à 5 (Toujours)</p>
+                <p><strong>Durée estimée :</strong> 40-50 minutes • <strong>84 items au total</strong></p>
+                <p><strong>Vous recevrez :</strong> Portrait psychologique détaillé, associations entre masques, réponses extrêmes, FAQ personnalisée</p>
+            </div>
+
+            <div class="demographics">
+                <div class="demographic-field">
+                    <label for="prenom">Prénom / Initiales :</label>
+                    <input type="text" id="prenom" placeholder="Ex: C.B.">
+                </div>
+                <div class="demographic-field">
+                    <label for="age">Âge :</label>
+                    <input type="number" id="age" min="18" max="120">
+                </div>
+                <div class="demographic-field">
+                    <label for="genre">Genre :</label>
+                    <select id="genre">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="feminin">Féminin</option>
+                        <option value="masculin">Masculin</option>
+                        <option value="autre">Autre</option>
+                        <option value="prefer">Préfère ne pas dire</option>
+                    </select>
+                </div>
+                <div class="demographic-field">
+                    <label for="situation">Situation professionnelle :</label>
+                    <select id="situation">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="salarie">Salarié(e)</option>
+                        <option value="independant">Indépendant(e)</option>
+                        <option value="sans-emploi">Sans emploi</option>
+                        <option value="etudiant">Étudiant(e)</option>
+                        <option value="retraite">Retraité(e)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button class="btn-primary" onclick="startQuestionnaire()">Commencer le questionnaire →</button>
+            </div>
+        </div>
+
+        <div class="section" id="section-red"></div>
+        <div class="section" id="section-orange"></div>
+        <div class="section" id="section-yellow"></div>
+        <div class="section" id="section-green"></div>
+        <div class="section" id="section-blue"></div>
+        <div class="section" id="section-indigo"></div>
+        <div class="section" id="section-violet"></div>
+
+        <div class="section" id="section-results">
+            <div class="results-header">
+                <h2>📊 Votre Analyse Complète V.A.L.E.U.R©</h2>
+                <p id="result-date"></p>
+            </div>
+
+            <div id="results-content">
+                <div class="scores-grid" id="scores-container"></div>
+                <div class="portrait-section">
+                    <h3>🎭 Votre Portrait Psychologique Complet</h3>
+                    <div id="portrait-global"></div>
+                    <h4>🔗 Associations Entre Vos Masques</h4>
+                    <div id="associations-container"></div>
+                    <h4>⚠️ Réponses Extrêmes Détectées</h4>
+                    <div id="extreme-responses"></div>
+                    <div class="faq-section">
+                        <h4>❓ Questions Fréquentes Personnalisées</h4>
+                        <div id="faq-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="export-buttons">
+                <button class="btn-export" onclick="exportPDF()">
+                    <span>📄</span><span>Télécharger PDF</span>
+                </button>
+                <button class="btn-export btn-google" onclick="saveToGoogleDrive()">
+                    <span>💾</span><span>Google Drive</span>
+                </button>
+                <button class="btn-export" onclick="window.print()">
+                    <span>🖨️</span><span>Imprimer</span>
+                </button>
+                <button class="btn-export btn-reset" onclick="resetQuestionnaire()">
+                    <span>🔄</span><span>Recommencer</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questionnaire = {
+            red: {
+                name: "MASQUE ROUGE",
+                color: "red",
+                fear: "La mort / Maladie",
+                emoji: "🔴",
+                subtitle: "Anxiété de Santé • Hypervigilance Somatique",
+                description: "Surveillance excessive des sensations corporelles et interprétation catastrophique des symptômes physiques.",
+                items: [
+                    { id: "R1", text: "Je surveille constamment mes battements cardiaques, ma respiration ou ma température corporelle", inverted: false },
+                    { id: "R_inv1", text: "Je fais confiance à mon corps et à sa capacité autorégulative de maintien de la santé", inverted: true },
+                    { id: "R2", text: "Lorsque je ressens une sensation corporelle inhabituelle, j'anticipe immédiatement le pire diagnostic", inverted: false },
+                    { id: "R_inv2", text: "Lorsque je ressens une sensation physique mineure, j'évalue qu'elle est probablement bénigne", inverted: true },
+                    { id: "R3", text: "Je recherche mes symptômes en ligne ou consulte des sources médicales pour auto-diagnostiquer mes maux", inverted: false },
+                    { id: "R_inv3", text: "Je peux pratiquer une activité physique sans préoccupation excessive concernant ma santé", inverted: true },
+                    { id: "R4", text: "J'évite certaines activités physiques (escaliers, sport, transports) par appréhension qu'un événement grave survienne", inverted: false },
+                    { id: "R_inv4", text: "Je suis rarement préoccupé(e) par ma santé ou par l'émergence potentielle de pathologies", inverted: true },
+                    { id: "R5", text: "Je me réveille la nuit avec une angoisse concernant ma santé ou mon intégrité physique", inverted: false },
+                    { id: "R6", text: "J'ai besoin d'une réassurance répétée de professionnels médicaux ou de mes proches concernant ma santé", inverted: false },
+                    { id: "R7", text: "La moindre douleur corporelle déclenche immédiatement des pensées de maladie grave (cancer, infarctus, AVC)", inverted: false },
+                    { id: "R8", text: "J'ai consulté plusieurs médecins pour un même symptôme car aucune réassurance n'a été suffisante", inverted: false }
+                ]
+            },
+            orange: {
+                name: "MASQUE ORANGE",
+                color: "orange",
+                fear: "La douleur / Souffrance émotionnelle",
+                emoji: "🟠",
+                subtitle: "Alexithymie • Évitement Émotionnel • Dissociation",
+                description: "Difficulté à identifier et exprimer les états émotionnels, accompagnée d'engourdissement affectif.",
+                items: [
+                    { id: "O1", text: "Je change de sujet ou me retire lorsqu'une conversation devient trop chargée émotionnellement", inverted: false },
+                    { id: "O_inv1", text: "Je ressens et identifie clairement mes différents états émotionnels", inverted: true },
+                    { id: "O2", text: "Je ressens un malaise significatif lorsqu'autrui pleure ou exprime des émotions intenses en ma présence", inverted: false },
+                    { id: "O_inv2", text: "L'intimité émotionnelle avec autrui me semble naturelle et confortable", inverted: true },
+                    { id: "O3", text: "J'éprouve des difficultés à identifier et nommer précisément ce que je ressens (peur, colère, tristesse, joie)", inverted: false },
+                    { id: "O_inv3", text: "J'ai pleuré récemment et ai pu exprimer authentiquement ce que je ressentais", inverted: true },
+                    { id: "O4", text: "Je maintiens un niveau d'activité constant pour éviter de me retrouver seul(e) avec mes émotions", inverted: false },
+                    { id: "O_inv4", text: "Mon corps me semble vivant, habité et connecté à mes émotions", inverted: true },
+                    { id: "O5", text: "J'utilise l'humour ou la dérision comme mécanisme d'évitement face aux situations émotionnellement difficiles", inverted: false },
+                    { id: "O6", text: "Je me sens émotionnellement engourdi(e), comme si j'observais ma propre vie de l'extérieur", inverted: false },
+                    { id: "O7", text: "J'évite délibérément les films, lectures ou situations susceptibles de m'émouvoir intensément", inverted: false },
+                    { id: "O8", text: "Je n'ai pas pleuré depuis une période prolongée, même lors d'événements objectivement difficiles", inverted: false }
+                ]
+            },
+            yellow: {
+                name: "MASQUE JAUNE",
+                color: "yellow",
+                fear: "L'inconnu / Incertitude",
+                emoji: "🟡",
+                subtitle: "Intolérance à l'Incertitude • Besoin de Contrôle",
+                description: "Difficulté à tolérer l'ambiguïté, entraînant des comportements de sur-contrôle et d'hyper-planification.",
+                items: [
+                    { id: "J1", text: "Je planifie excessivement chaque aspect de mon existence pour anticiper et prévenir les imprévus", inverted: false },
+                    { id: "J_inv1", text: "J'apprécie l'imprévu et les surprises, même lorsqu'elles sont inattendues", inverted: true },
+                    { id: "J2", text: "L'incertitude ou l'absence d'information sur ce qui va advenir génère une anxiété considérable", inverted: false },
+                    { id: "J_inv2", text: "Je peux prendre des décisions sans disposer de toutes les informations", inverted: true },
+                    { id: "J3", text: "Je vérifie de manière répétée mes actions (fermetures, appareils, communications) pour m'assurer de leur exactitude", inverted: false },
+                    { id: "J_inv3", text: "Je suis flexible et peux aisément adapter mes plans face aux circonstances", inverted: true },
+                    { id: "J4", text: "Les modifications de planification ou d'horaire, même mineures, déclenchent un stress significatif", inverted: false },
+                    { id: "J_inv4", text: "L'incertitude ne constitue pas une source d'anxiété significative pour moi", inverted: true },
+                    { id: "J5", text: "J'ai développé des routines rigides et leur modification me perturbe profondément", inverted: false },
+                    { id: "J6", text: "Je rumine constamment sur l'ensemble des scénarios possibles et leurs conséquences potentielles", inverted: false },
+                    { id: "J7", text: "J'ai besoin d'une quantité importante d'informations avant de prendre même une décision mineure", inverted: false },
+                    { id: "J8", text: "Les surprises, même positives ou agréables, génèrent un inconfort psychologique", inverted: false }
+                ]
+            },
+            green: {
+                name: "MASQUE VERT",
+                color: "green",
+                fear: "Le rejet / Abandon",
+                emoji: "🟢",
+                subtitle: "Anxiété de Séparation • Dépendance Affective",
+                description: "Crainte intense du rejet et de la solitude, entraînant sur-adaptation et effacement de soi.",
+                items: [
+                    { id: "V1", text: "J'acquiesce à la majorité des demandes, même lorsque je n'en ai authentiquement pas l'envie", inverted: false },
+                    { id: "V_inv1", text: "Je peux affirmer mes besoins authentiques sans crainte excessive du rejet", inverted: true },
+                    { id: "V2", text: "Un message sans réponse rapide déclenche une anxiété et une rumination importantes", inverted: false },
+                    { id: "V_inv2", text: "Je suis à l'aise et serein(e) dans la solitude", inverted: true },
+                    { id: "V3", text: "J'adapte ma personnalité, mes opinions et mes préférences en fonction de mon interlocuteur", inverted: false },
+                    { id: "V_inv3", text: "Je sais poser des limites et dire « non » lorsque quelque chose ne me convient pas", inverted: true },
+                    { id: "V4", text: "Je suis incapable d'affirmer mes besoins ou désirs authentiques par crainte de générer un conflit", inverted: false },
+                    { id: "V_inv4", text: "Je me sens aimé(e) et accepté(e) pour qui je suis authentiquement", inverted: true },
+                    { id: "V5", text: "J'ai besoin d'une réassurance constante concernant l'affection et l'acceptation d'autrui à mon égard", inverted: false },
+                    { id: "V6", text: "Je maintiens des relations insatisfaisantes ou délétères par peur de me retrouver seul(e)", inverted: false },
+                    { id: "V7", text: "Je me surcharge de responsabilités pour me rendre indispensable et garantir ma place", inverted: false },
+                    { id: "V8", text: "La solitude représente une terreur profonde et je déploie tous les moyens pour l'éviter", inverted: false }
+                ]
+            },
+            blue: {
+                name: "MASQUE BLEU",
+                color: "blue",
+                fear: "L'impuissance",
+                emoji: "🔵",
+                subtitle: "Hypercontrôle • Besoin de Domination",
+                description: "Besoin compulsif de contrôle avec intolérance aux situations d'impuissance ou de dépendance.",
+                items: [
+                    { id: "B1", text: "Je reprends immédiatement le contrôle ou corrige autrui lorsque les choses sont réalisées différemment", inverted: false },
+                    { id: "B_inv1", text: "Je peux facilement déléguer et faire confiance aux compétences d'autrui", inverted: true },
+                    { id: "B2", text: "Déléguer m'est extrêmement difficile car je suis convaincu(e) qu'autrui ne fera pas aussi bien", inverted: false },
+                    { id: "B_inv2", text: "Lorsque les événements m'échappent, je maintiens ma sérénité intérieure", inverted: true },
+                    { id: "B3", text: "Je ressens une irritation viscérale et profonde lorsque les événements m'échappent", inverted: false },
+                    { id: "B_inv3", text: "J'accueille les critiques et les perspectives divergentes avec ouverture", inverted: true },
+                    { id: "B4", text: "J'ai des réactions de colère disproportionnées face à la perte de contrôle d'une situation", inverted: false },
+                    { id: "B_inv4", text: "Je n'ai pas besoin d'être en position dominante ou de contrôle pour me sentir en sécurité", inverted: true },
+                    { id: "B5", text: "Je suis très susceptible et réagis intensément à toute forme de critique, même constructive", inverted: false },
+                    { id: "B6", text: "J'ai un besoin significatif d'être reconnu(e), admiré(e) ou d'occuper une position d'influence", inverted: false },
+                    { id: "B7", text: "Je ressens une anxiété majeure ou un sentiment d'impuissance lorsque je dois dépendre d'autrui", inverted: false },
+                    { id: "B8", text: "Je tends à diriger, organiser et prendre les décisions pour les autres, même sans sollicitation", inverted: false }
+                ]
+            },
+            indigo: {
+                name: "MASQUE INDIGO",
+                color: "indigo",
+                fear: "L'échec / Insuffisance",
+                emoji: "🟣",
+                subtitle: "Perfectionnisme • Syndrome de l'Imposteur",
+                description: "Standards irréalistes, auto-critique sévère et doute chronique concernant sa compétence.",
+                items: [
+                    { id: "I1", text: "Je procrastine ou diffère mes actions par crainte que mon travail ne soit pas suffisamment parfait", inverted: false },
+                    { id: "I_inv1", text: "Je reconnais et valorise mes accomplissements avec fierté", inverted: true },
+                    { id: "I2", text: "Je minimise systématiquement mes accomplissements et mes succès", inverted: false },
+                    { id: "I_inv2", text: "Je peux entreprendre de nouvelles activités même sans garantie de perfection", inverted: true },
+                    { id: "I3", text: "J'éprouve le sentiment profond d'être un(e) imposteur(e) qui a bénéficié de chance jusqu'à présent", inverted: false },
+                    { id: "I_inv3", text: "Je me sens compétent(e) et légitime dans mes domaines d'expertise", inverted: true },
+                    { id: "I4", text: "Je me compare constamment à autrui et me perçois toujours comme inférieur(e) ou insuffisant(e)", inverted: false },
+                    { id: "I_inv4", text: "Une erreur représente pour moi une opportunité d'apprentissage, non une remise en cause de ma valeur", inverted: true },
+                    { id: "I5", text: "Je retravaille excessivement mes productions car elles ne sont jamais assez abouties pour être partagées", inverted: false },
+                    { id: "I6", text: "J'évite de relever des défis, de prendre des initiatives ou d'expérimenter de nouvelles compétences", inverted: false },
+                    { id: "I7", text: "Une erreur mineure me fait intensément douter de ma compétence globale et de ma valeur", inverted: false },
+                    { id: "I8", text: "J'ai un besoin constant de validation externe pour me sentir compétent(e) et légitime", inverted: false }
+                ]
+            },
+            violet: {
+                name: "MASQUE VIOLET",
+                color: "violet",
+                fear: "L'aliénation / Perte de soi",
+                emoji: "⚫",
+                subtitle: "Aliénation Identitaire • Faux-Self • Crise Existentielle",
+                description: "Perte du sens de soi authentique, sentiment de vide intérieur et peur de la transformation.",
+                items: [
+                    { id: "Vi1", text: "J'ai l'impression d'avoir perdu contact avec qui je suis réellement", inverted: false },
+                    { id: "Vi_inv1", text: "J'ai une compréhension claire et stable de mon identité profonde", inverted: true },
+                    { id: "Vi2", text: "Je me demande souvent si ma vie actuelle correspond vraiment à mes aspirations authentiques", inverted: false },
+                    { id: "Vi_inv2", text: "Mes choix de vie reflètent fidèlement mes valeurs et mes désirs profonds", inverted: true },
+                    { id: "Vi3", text: "J'ai l'impression de jouer un rôle plutôt que d'être authentiquement moi-même", inverted: false },
+                    { id: "Vi_inv3", text: "Je me sens en accord avec mes actions et mes comportements au quotidien", inverted: true },
+                    { id: "Vi4", text: "Je ne sais plus ce que je veux vraiment dans la vie", inverted: false },
+                    { id: "Vi_inv4", text: "J'ai des objectifs clairs qui me motivent et m'animent", inverted: true },
+                    { id: "Vi5", text: "J'ai sacrifié mes aspirations personnelles pour répondre aux attentes d'autrui", inverted: false },
+                    { id: "Vi6", text: "Je me sens déconnecté(e) de mes émotions, de mes valeurs et de mes besoins fondamentaux", inverted: false },
+                    { id: "Vi7", text: "Je me demande souvent 'Qui suis-je vraiment ?' sans trouver de réponse satisfaisante", inverted: false },
+                    { id: "Vi8", text: "J'ai construit une vie qui ne me ressemble pas vraiment", inverted: false }
+                ]
+            }
+        };
+
+        let currentSection = 0;
+        let responses = {};
+        const sections = ['welcome', 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', 'results'];
+
+        document.addEventListener('DOMContentLoaded', renderMaskSections);
+
+        function renderMaskSections() {
+            Object.keys(questionnaire).forEach(key => {
+                const mask = questionnaire[key];
+                const section = document.getElementById(`section-${key}`);
+
+                section.innerHTML = `
+                    <div class="section-title">
+                        <div class="section-icon" style="background: rgba(${key==='red'?'239,68,68':key==='orange'?'249,115,22':key==='yellow'?'245,158,11':key==='green'?'34,197,94':key==='blue'?'59,130,246':key==='indigo'?'139,92,246':'236,72,153'}, 0.1);">${mask.emoji}</div>
+                        <div>
+                            <div>${mask.name}</div>
+                            <div style="font-size: 0.7em; color: var(--slate-500);">${mask.subtitle}</div>
+                        </div>
+                    </div>
+                    <p class="section-subtitle">${mask.description}</p>
+                    <div id="items-${key}"></div>
+                    <div class="buttons">
+                        <button class="btn-secondary" onclick="previousSection()">← Retour</button>
+                        <button class="btn-primary" onclick="nextSection()">${key === 'violet' ? 'Voir mes résultats →' : 'Suivant →'}</button>
+                    </div>
+                `;
+
+                renderItems(mask.items, `items-${key}`, key);
+            });
+        }
+
+        function renderItems(items, containerId, maskKey) {
+            const container = document.getElementById(containerId);
+            items.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'item-container';
+                div.innerHTML = `
+                    <div class="item-number">Item ${index + 1}/12</div>
+                    <div class="item-text">${item.text}</div>
+                    <div class="scale-container">
+                        ${[0, 1, 2, 3, 4, 5].map(value => `
+                            <div class="scale-option">
+                                <input type="radio" name="${item.id}" value="${value}" id="${item.id}_${value}"
+                                       onchange="saveResponse('${maskKey}', '${item.id}', ${value}, ${item.inverted})">
+                                <label for="${item.id}_${value}">${value}<br><span style="font-size:0.75em">${['Jamais','Rarement','Parfois','Souvent','Très souvent','Toujours'][value]}</span></label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function saveResponse(mask, itemId, value, inverted) {
+            if (!responses[mask]) responses[mask] = {};
+            responses[mask][itemId] = inverted ? (5 - value) : value;
+        }
+
+        function startQuestionnaire() {
+            const prenom = document.getElementById('prenom').value;
+            const age = document.getElementById('age').value;
+            const genre = document.getElementById('genre').value;
+            const situation = document.getElementById('situation').value;
+
+            if (!prenom || !age || !genre || !situation) {
+                alert('Veuillez remplir tous les champs avant de continuer');
+                return;
+            }
+
+            responses.demographics = { prenom, age, genre, situation };
+            nextSection();
+        }
+
+        function nextSection() {
+            if (currentSection < sections.length - 1) {
+                document.getElementById(`section-${sections[currentSection]}`).classList.remove('active');
+                currentSection++;
+                document.getElementById(`section-${sections[currentSection]}`).classList.add('active');
+                updateProgressBar();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                if (sections[currentSection] === 'results') calculateAndDisplayResults();
+            }
+        }
+
+        function previousSection() {
+            if (currentSection > 0) {
+                document.getElementById(`section-${sections[currentSection]}`).classList.remove('active');
+                currentSection--;
+                document.getElementById(`section-${sections[currentSection]}`).classList.add('active');
+                updateProgressBar();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function updateProgressBar() {
+            document.querySelector('.progress-fill').style.width = (currentSection / (sections.length - 1)) * 100 + '%';
+        }
+
+        function calculateAndDisplayResults() {
+            const scores = {};
+            const MAX = 60;
+
+            Object.keys(questionnaire).forEach(key => {
+                const total = Object.values(responses[key] || {}).reduce((sum, val) => sum + val, 0);
+                const pct = (total / MAX) * 100;
+                scores[key] = {
+                    total,
+                    max: MAX,
+                    percentage: pct,
+                    level: pct < 25 ? {level:'Faible',color:'#22c55e',interpretation:'Mécanisme minimal'} :
+                           pct < 50 ? {level:'Modéré',color:'#eab308',interpretation:'Présent mais non dominant'} :
+                           pct < 75 ? {level:'Élevé',color:'#f97316',interpretation:'Nécessite attention'} :
+                                     {level:'Très élevé',color:'#ef4444',interpretation:'Accompagnement recommandé'}
+                };
+            });
+
+            displayScores(scores);
+            displayFullPortrait(scores);
+            displayAssociations(scores);
+            displayExtremeResponses();
+            displayPersonalizedFAQ(scores);
+
+            document.getElementById('result-date').textContent = 
+                `Complété le ${new Date().toLocaleDateString('fr-FR', {weekday:'long',year:'numeric',month:'long',day:'numeric'})} par ${responses.demographics.prenom}`;
+        }
+
+        function displayScores(scores) {
+            const container = document.getElementById('scores-container');
+            container.innerHTML = '';
+
+            Object.keys(questionnaire).forEach(key => {
+                const mask = questionnaire[key];
+                const score = scores[key];
+                const card = document.createElement('div');
+                card.className = `score-card ${key}`;
+                card.innerHTML = `
+                    <h3>${mask.emoji} ${mask.name}</h3>
+                    <div class="score-value">${score.total}/60</div>
+                    <div class="score-level" style="color: ${score.level.color}">${score.level.level}</div>
+                    <div style="font-size: 0.9em; margin-top: 10px;">${score.level.interpretation}</div>
+                    <div class="score-bar">
+                        <div class="score-bar-fill" style="width: ${score.percentage}%; background: ${score.level.color};"></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function displayFullPortrait(scores) {
+            const sorted = Object.entries(scores).sort((a, b) => b[1].total - a[1].total);
+            const [topKey, topScore] = sorted[0];
+            const mask = questionnaire[topKey];
+            const high = sorted.filter(([k, s]) => s.total >= 30);
+
+            let html = `
+                <p class="portrait-text">
+                    <strong>Votre masque dominant est le ${mask.name} ${mask.emoji}</strong>, 
+                    avec un score de ${topScore.total}/60 (${Math.round(topScore.percentage)}%).
+                </p>
+                <p class="portrait-text">
+                    <strong>Peur fondamentale :</strong> ${mask.fear}<br>
+                    <strong>Manifestations :</strong> ${mask.subtitle}<br>
+                    <strong>Description :</strong> ${mask.description}
+                </p>
+            `;
+
+            if (high.length > 1) {
+                html += `
+                    <div class="warning-box">
+                        <strong>⚠️ Configuration Mixte Détectée</strong><br>
+                        Vous avez ${high.length} masques avec des scores élevés (≥30/60).
+                    </div>
+                    <p class="portrait-text"><strong>Masques secondaires :</strong></p>
+                    <ul>${high.slice(1).map(([k, s]) => `<li><strong>${questionnaire[k].emoji} ${questionnaire[k].name}</strong> : ${s.total}/60 - ${questionnaire[k].fear}</li>`).join('')}</ul>
+                `;
+            }
+
+            if (scores.violet.total >= 48) {
+                html += `
+                    <div class="warning-box">
+                        <strong>🚨 Masque Violet Très Élevé</strong><br>
+                        Perte d'identité globale. Accompagnement thérapeutique fortement recommandé.
+                    </div>
+                `;
+            }
+
+            document.getElementById('portrait-global').innerHTML = html;
+        }
+
+        function displayAssociations(scores) {
+            const assocs = {
+                'red-orange': {n:'Rouge + Orange : Hypervigilance Dissociée', d:'Obsédé(e) par votre santé mais incapable de ressentir cette peur émotionnellement.'},
+                'red-yellow': {n:'Rouge + Jaune : Anxiété Amplifiée', d:'Rumination constante sur les pires scénarios de santé.'},
+                'yellow-indigo': {n:'Jaune + Indigo : Perfectionnisme Paralysant', d:'Immobilité décisionnelle totale.'},
+                'green-blue': {n:'Vert + Bleu : Dynamique Toxique', d:'Vous contrôlez pour ne pas être quitté(e).'},
+                'green-violet': {n:'Vert + Violet : Codépendance Sévère', d:'Dépendance totale à la validation d\'autrui.'},
+                'orange-violet': {n:'Orange + Violet : Dissociation Complète', d:'Absence totale de connexion à soi-même.'}
+            };
+
+            const detected = [];
+            const keys = Object.keys(questionnaire);
+            for (let i = 0; i < keys.length; i++) {
+                for (let j = i + 1; j < keys.length; j++) {
+                    if (scores[keys[i]].total >= 30 && scores[keys[j]].total >= 30) {
+                        const ak = `${keys[i]}-${keys[j]}`;
+                        detected.push({
+                            key: ak,
+                            m1: questionnaire[keys[i]],
+                            m2: questionnaire[keys[j]],
+                            s1: scores[keys[i]].total,
+                            s2: scores[keys[j]].total,
+                            info: assocs[ak]
+                        });
+                    }
+                }
+            }
+
+            const container = document.getElementById('associations-container');
+            if (detected.length === 0) {
+                container.innerHTML = '<p class="portrait-text">Masque dominant unique, stratégie défensive ciblée.</p>';
+                return;
+            }
+
+            let html = `<p class="portrait-text"><strong>${detected.length} association(s) détectée(s)</strong></p>`;
+            detected.forEach(a => {
+                html += `
+                    <div class="association-card">
+                        <h5>${a.m1.emoji} ${a.m1.name} + ${a.m2.emoji} ${a.m2.name}</h5>
+                        <p><strong>Scores :</strong> ${a.s1}/60 + ${a.s2}/60</p>
+                        ${a.info ? `<p><strong>${a.info.n}</strong></p><p>${a.info.d}</p>` : ''}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function displayExtremeResponses() {
+            const extremes = {always: [], never: []};
+
+            Object.keys(questionnaire).forEach(mk => {
+                const mask = questionnaire[mk];
+                const resp = responses[mk] || {};
+                mask.items.forEach(item => {
+                    const v = resp[item.id];
+                    if (v === 5) extremes.always.push({m: mask.name, e: mask.emoji, t: item.text});
+                    if (v === 0) extremes.never.push({m: mask.name, e: mask.emoji, t: item.text});
+                });
+            });
+
+            let html = '';
+            if (extremes.always.length === 0 && extremes.never.length === 0) {
+                html = '<p class="portrait-text">Aucune réponse extrême. Nuance et flexibilité présentes.</p>';
+            } else {
+                if (extremes.always.length > 0) {
+                    html += `<h5 style="color: #ef4444;">🚨 Réponses "Toujours" (5/5) - ${extremes.always.length} item(s)</h5>
+                             <p>Comportements systématiques et rigides.</p>
+                             <div class="extreme-responses">${extremes.always.map(i => `<div class="extreme-item"><strong>${i.e} ${i.m}</strong><br>"${i.t}"</div>`).join('')}</div>`;
+                }
+                if (extremes.never.length > 0) {
+                    html += `<h5 style="color: var(--teal-600); margin-top: 25px;">✅ Réponses "Jamais" (0/5) - ${extremes.never.length} item(s)</h5>
+                             <p>Zones de flexibilité préservée.</p>
+                             <div class="extreme-responses" style="background: rgba(34,197,94,0.08);">${extremes.never.map(i => `<div class="extreme-item"><strong>${i.e} ${i.m}</strong><br>"${i.t}"</div>`).join('')}</div>`;
+                }
+            }
+            document.getElementById('extreme-responses').innerHTML = html;
+        }
+
+        function displayPersonalizedFAQ(scores) {
+            const faq = [
+                {q:"J'ai plusieurs masques élevés. Normal ?",a:"Oui, très courant. Association de 2-3 masques qui s'amplifient mutuellement."},
+                {q:"Mes masques vont-ils diminuer ?",a:"Pas seuls. Ils se figent avec l'âge. MAIS avec prise de conscience et travail, transformation possible."}
+            ];
+
+            if (scores.violet.total >= 48) faq.push({q:"Masque Violet très élevé ?",a:"Perte d'identité globale. Accompagnement professionnel recommandé."});
+            if (scores.green.total >= 30 && scores.blue.total >= 30) faq.push({q:"Vert + Bleu élevés ?",a:"Vous contrôlez pour éviter l'abandon. Cycle destructeur."});
+
+            document.getElementById('faq-container').innerHTML = faq.map(f => `
+                <div class="faq-item">
+                    <div class="faq-question">❓ ${f.q}</div>
+                    <div class="faq-answer">${f.a}</div>
+                </div>
+            `).join('');
+        }
+
+        async function exportPDF() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            try {
+                const {jsPDF} = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const content = document.getElementById('results-content');
+                const canvas = await html2canvas(content, {scale: 2, useCORS: true});
+                const imgData = canvas.toDataURL('image/png');
+                const imgW = 210;
+                const imgH = (canvas.height * imgW) / canvas.width;
+                let h = imgH;
+                let pos = 0;
+                pdf.addImage(imgData, 'PNG', 0, pos, imgW, imgH);
+                h -= 297;
+                while (h >= 0) {
+                    pos = h - imgH;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, pos, imgW, imgH);
+                    h -= 297;
+                }
+                pdf.save(`Resultats_VALEUR_${responses.demographics.prenom}_${new Date().toISOString().split('T')[0]}.pdf`);
+                document.getElementById('loadingOverlay').style.display = 'none';
+                alert('✅ PDF téléchargé !');
+            } catch(e) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                alert('❌ Erreur PDF. Utilisez Imprimer (Ctrl+P).');
+            }
+        }
+
+        function saveToGoogleDrive() {
+            alert('📌 Pour sauvegarder sur Google Drive:\n\n1. Téléchargez le PDF\n2. Allez sur drive.google.com\n3. Importez le fichier\n\nOu utilisez Ctrl+P → "Enregistrer au format PDF"');
+        }
+
+        function resetQuestionnaire() {
+            if (confirm('Recommencer ? Toutes vos réponses seront perdues.')) {
+                responses = {};
+                currentSection = 0;
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById('section-welcome').classList.add('active');
+                updateProgressBar();
+                document.querySelectorAll('input').forEach(i => {i.checked = false; i.value = '';});
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }
+        }
+    </script>
+</body>
+</html>
